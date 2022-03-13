@@ -14,7 +14,7 @@ mark a call as a factory
 """
 macro factory(exp::Expr)
     if exp.head != :call
-        @warn "'${exp.args[1]}' is not a valid factory. It must be an expressions of type :call"
+        @warn "'$(exp.args[1])' is not a valid factory. It must be an expressions of type :call"
         return
     end
 
@@ -54,7 +54,7 @@ function build(s::Symbol, num=1; kwargs...)
                 e.args[2] = v
                 found = true
                 break
-            end
+        end
         end
         if !found push!(new_keyword_expressions, Expr(:kw, k, v)) end
     end
