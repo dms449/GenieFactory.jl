@@ -1,8 +1,9 @@
 module GenieFactory
 
-import Genie
 using Logging
-using SearchLight
+
+import Genie
+import SearchLight
 export create, build, @factory
 
 const factories = Dict()
@@ -29,7 +30,7 @@ Build a model instance AND persist it to the database
 """
 function create(s::Symbol, num=1; kwargs...)
     records = build(s, num; kwargs...)
-    if !all(map(save, records))
+    if !all(map(SearchLight.save, records))
         @error "not all instances were properly created and/or persisted"
     end
     return num == 1 ? records[1] : records
