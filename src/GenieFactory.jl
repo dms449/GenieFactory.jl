@@ -64,7 +64,7 @@ function build(s::Symbol, num=1; kwargs...)
     if num == 1
         return Core.eval(mod, expr)
     elseif num > 1
-        return [eval(expr) for i in 1:num]
+        return [Core.eval(mod, expr) for i in 1:num]
     else
         throw(BoundsError(num, "argument must be greater than or equal to 1"))
     end
