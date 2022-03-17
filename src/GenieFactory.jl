@@ -1,8 +1,9 @@
 module GenieFactory
 
-import Genie
 using Logging
-using SearchLight
+
+import Genie
+import SearchLight
 export create, build, @factory
 
 const factories = Dict()
@@ -14,7 +15,7 @@ mark a call as a factory
 """
 macro factory(exp::Expr)
     if exp.head != :call
-        @warn "'${exp.args[1]}' is not a valid factory. It must be an expressions of type :call"
+        @warn "'$(exp.args[1])' is not a valid factory. It must be an expressions of type :call"
         return
     end
 
@@ -29,7 +30,7 @@ Build a model instance AND persist it to the database
 """
 function create(s::Symbol, num=1; kwargs...)
     records = build(s, num; kwargs...)
-    if !all(map(save, records))
+    if !all(map(SearchLight.save, records))
         @error "not all instances were properly created and/or persisted"
     end
     return num == 1 ? records[1] : records
@@ -54,7 +55,7 @@ function build(s::Symbol, num=1; kwargs...)
                 e.args[2] = v
                 found = true
                 break
-            end
+        end
         end
         if !found push!(new_keyword_expressions, Expr(:kw, k, v)) end
     end
@@ -63,7 +64,7 @@ function build(s::Symbol, num=1; kwargs...)
     if num == 1
         return Core.eval(mod, expr)
     elseif num > 1
-        return [eval(expr) for i in 1:num]
+        return [Core.eval(mod, expr) for i in 1:num]
     else
         throw(BoundsError(num, "argument must be greater than or equal to 1"))
     end
